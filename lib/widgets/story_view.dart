@@ -76,9 +76,7 @@ class StoryView extends StatefulWidget {
   // Indicator Color
   final Color indicatorColor;
 
-  final Widget? title;
-
-  final Widget? action;
+  final Widget? bottom;
 
   StoryView({
     required this.storyItems,
@@ -90,8 +88,7 @@ class StoryView extends StatefulWidget {
     this.inline = false,
     this.onVerticalSwipeComplete,
     this.indicatorColor = Colors.white,
-    this.title,
-    this.action,
+    this.bottom,
   });
 
   @override
@@ -296,46 +293,6 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
       child: Stack(
         children: <Widget>[
           _currentView,
-          Visibility(
-            visible: widget.progressPosition != ProgressPosition.none,
-            child: Align(
-              alignment: widget.progressPosition == ProgressPosition.top
-                  ? Alignment.topCenter
-                  : Alignment.bottomCenter,
-              child: SafeArea(
-                bottom: widget.inline ? false : true,
-                // we use SafeArea here for notched and bezeles phones
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  child: Column(
-                    children: [
-                      PageBar(
-                        widget.storyItems
-                            .map((it) => PageData(it!.duration, it.shown))
-                            .toList(),
-                        this._currentAnimation,
-                        key: UniqueKey(),
-                        indicatorHeight: widget.inline
-                            ? IndicatorHeight.small
-                            : IndicatorHeight.large,
-                        indicatorColor: widget.indicatorColor,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          widget.title ?? const SizedBox(),
-                          widget.action ?? const SizedBox(),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
           Align(
               alignment: Alignment.centerRight,
               heightFactor: 1,
@@ -398,6 +355,40 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
                 }),
                 width: 70),
           ),
+          Visibility(
+            visible: widget.progressPosition != ProgressPosition.none,
+            child: Align(
+              alignment: widget.progressPosition == ProgressPosition.top
+                  ? Alignment.topCenter
+                  : Alignment.bottomCenter,
+              child: SafeArea(
+                bottom: widget.inline ? false : true,
+                // we use SafeArea here for notched and bezeles phones
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: PageBar(
+                          widget.storyItems
+                              .map((it) => PageData(it!.duration, it.shown))
+                              .toList(),
+                          this._currentAnimation,
+                          key: UniqueKey(),
+                          indicatorHeight: widget.inline
+                              ? IndicatorHeight.small
+                              : IndicatorHeight.large,
+                          indicatorColor: widget.indicatorColor,
+                        ),
+                      ),
+                      if (widget.bottom != null) widget.bottom!,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -436,7 +427,7 @@ class PageBar extends StatefulWidget {
 }
 
 class PageBarState extends State<PageBar> {
-  double spacing = 4;
+  double spacing = 5;
 
   @override
   void initState() {
@@ -472,7 +463,7 @@ class PageBarState extends State<PageBar> {
             child: StoryProgressIndicator(
               isPlaying(it) ? widget.animation!.value : (it.shown ? 1 : 0),
               indicatorHeight:
-                  widget.indicatorHeight == IndicatorHeight.large ? 5 : 3,
+                  widget.indicatorHeight == IndicatorHeight.large ? 5 : 2,
               indicatorColor: widget.indicatorColor,
             ),
           ),
@@ -503,11 +494,11 @@ class StoryProgressIndicator extends StatelessWidget {
         this.indicatorHeight,
       ),
       foregroundPainter: IndicatorOval(
-        this.indicatorColor.withOpacity(0.8),
+        this.indicatorColor,
         this.value,
       ),
       painter: IndicatorOval(
-        this.indicatorColor.withOpacity(0.4),
+        this.indicatorColor.withOpacity(.5),
         1.0,
       ),
     );
@@ -524,10 +515,12 @@ class IndicatorOval extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..color = this.color;
     canvas.drawRRect(
-        RRect.fromRectAndRadius(
-            Rect.fromLTWH(0, 0, size.width * this.widthFactor, size.height),
-            Radius.circular(3)),
-        paint);
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(0, 0, size.width * this.widthFactor, size.height),
+        Radius.circular(10),
+      ),
+      paint,
+    );
   }
 
   @override
