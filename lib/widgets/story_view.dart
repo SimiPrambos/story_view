@@ -76,7 +76,8 @@ class StoryView extends StatefulWidget {
   // Indicator Color
   final Color indicatorColor;
 
-  final Widget? bottom;
+  final Widget? bottomIndicator;
+  final double gestureHeight;
 
   StoryView({
     required this.storyItems,
@@ -88,7 +89,8 @@ class StoryView extends StatefulWidget {
     this.inline = false,
     this.onVerticalSwipeComplete,
     this.indicatorColor = Colors.white,
-    this.bottom,
+    this.bottomIndicator,
+    this.gestureHeight = .8,
   });
 
   @override
@@ -295,7 +297,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
           _currentView,
           Align(
               alignment: Alignment.centerRight,
-              heightFactor: 1,
+              heightFactor: widget.gestureHeight,
               child: GestureDetector(
                 onTapDown: (details) {
                   widget.controller.pause();
@@ -348,7 +350,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
               )),
           Align(
             alignment: Alignment.centerLeft,
-            heightFactor: 1,
+            heightFactor: widget.gestureHeight,
             child: SizedBox(
                 child: GestureDetector(onTap: () {
                   widget.controller.previous();
@@ -382,7 +384,8 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
                           indicatorColor: widget.indicatorColor,
                         ),
                       ),
-                      if (widget.bottom != null) widget.bottom!,
+                      if (widget.bottomIndicator != null)
+                        widget.bottomIndicator!,
                     ],
                   ),
                 ),
